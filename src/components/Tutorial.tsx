@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Dialog } from '@headlessui/react';
 import { Button } from './Button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { usePreferencesStore } from '../store/preferencesStore';
 
 interface TutorialStep {
   title: string;
   description: string;
+  highlight?: string;
 }
 
 const tutorialSteps: TutorialStep[] = [
@@ -16,45 +18,66 @@ const tutorialSteps: TutorialStep[] = [
   {
     title: 'Masukkan Fungsi',
     description: 'Gunakan kalkulator sains untuk memasukkan fungsi matematika. Anda dapat menggunakan fungsi trigonometri, eksponensial, dan operasi dasar.',
+    highlight: '.function-input',
   },
   {
     title: 'Tentukan Batas',
     description: 'Masukkan batas bawah dan atas untuk menentukan interval perhitungan integral.',
+    highlight: '.bounds-input',
   },
   {
     title: 'Visualisasi 2D dan 3D',
     description: 'Lihat grafik fungsi dalam bentuk 2D dan visualisasi benda putar 3D yang dapat dirotasi.',
+    highlight: '.visualization',
   },
   {
     title: 'Hasil Perhitungan',
     description: 'Dapatkan hasil perhitungan panjang busur, luas permukaan, dan volume benda putar.',
+    highlight: '.results',
   },
 ];
 
-export const Tutorial: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(true);
+interface TutorialProps {
+  forceShow?: boolean;
+}
+
+export const Tutorial: React.FC<TutorialProps> = ({ forceShow = false }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+
+  const tutorialSeen = usePreferencesStore(state => state.tutorialSeen);
+  const setTutorialSeen = usePreferencesStore(state => state.setTutorialSeen);
+
+  const [isOpen, setIsOpen] = useState(!tutorialSeen || forceShow);
+
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+    setTutorialSeen(true);
+  }, [setTutorialSeen]);
+
+  useEffect(() => {
+    setIsOpen(!tutorialSeen || forceShow);
+  }, [tutorialSeen, forceShow]);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (isOpen) {
         if (e.key === 'ArrowRight') handleNext();
         if (e.key === 'ArrowLeft') handlePrevious();
-        if (e.key === 'Escape') setIsOpen(false);
+        if (e.key === 'Escape') handleClose();
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [isOpen, currentStep]);
+  }, [isOpen, currentStep, handleClose]);
 
   const handleNext = () => {
     if (currentStep < tutorialSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      setIsOpen(false);
+      handleClose();
     }
   };
 
@@ -85,10 +108,26 @@ export const Tutorial: React.FC = () => {
     setTouchEnd(0);
   };
 
+  useEffect(() => {
+    if (isOpen && tutorialSteps[currentStep].highlight) {
+      const element = document.querySelector(tutorialSteps[currentStep].highlight!);
+      if (element) {
+        element.classList.add('tutorial-highlight');
+      }
+      return () => {
+        if (element) {
+          element.classList.remove('tutorial-highlight');
+        }
+      };
+    }
+  }, [isOpen, currentStep]);
+
+  if (!isOpen) return null;
+
   return (
     <Dialog
       open={isOpen}
-      onClose={() => setIsOpen(false)}
+      onClose={handleClose}
       className="fixed inset-0 z-50 overflow-y-auto"
     >
       <div className="min-h-screen px-4 flex items-center justify-center">
@@ -100,7 +139,14 @@ export const Tutorial: React.FC = () => {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <Dialog.Title className="text-xl sm:text-2xl font-semibold text-gray-900">
+          <button
+            onClick={handleClose}
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-500"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          <Dialog.Title className="text-xl sm:text-2xl font-semibold text-gray-900 pr-8">
             {tutorialSteps[currentStep].title}
           </Dialog.Title>
 

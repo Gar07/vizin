@@ -7,8 +7,10 @@ import { InteractiveLearning } from './components/InteractiveLearning';
 import { Tutorial } from './components/Tutorial';
 import { calculateArcLength, calculateSurfaceArea, calculateVolume, calculateDerivative } from './utils/calculus';
 import { CalculusResult } from './types';
-import { Github } from 'lucide-react';
+import { Github, HelpCircle } from 'lucide-react';
 import { useCalculusStore } from './store/calculusStore';
+import { usePreferencesStore } from './store/preferencesStore';
+import { Button } from './components/Button';
 
 function App() {
   const [currentFunction, setCurrentFunction] = useState('x^2');
@@ -24,8 +26,10 @@ function App() {
     surfaceAreaIntegral: '',
     volumeIntegral: '',
   });
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const addToHistory = useCalculusStore(state => state.addToHistory);
+  const resetTutorial = usePreferencesStore(state => state.resetTutorial);
 
   const handleFunctionSubmit = (func: string, lower: number, upper: number) => {
     try {
@@ -64,9 +68,14 @@ function App() {
     }
   };
 
+  const handleShowTutorial = () => {
+    resetTutorial();
+    setShowTutorial(true);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 py-4 sm:py-8 px-3 sm:px-4">
-      <Tutorial />
+      <Tutorial forceShow={showTutorial} />
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         <header className="text-center">
           <div className="flex items-center justify-center space-x-2 mb-3 sm:mb-4">
@@ -84,15 +93,25 @@ function App() {
             Pahami panjang busur, luas permukaan putaran, dan volume dengan
             bantuan visualisasi 2D dan 3D yang dinamis.
           </p>
-          <a
-            href="https://github.com/Gar07/vizin"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center space-x-2 text-blue-500 hover:text-blue-600 mt-3 sm:mt-4"
-          >
-            <Github className="w-5 h-5" />
-            <span>Lihat di GitHub</span>
-          </a>
+          <div className="flex items-center justify-center space-x-4 mt-3 sm:mt-4">
+            <a
+              href="https://github.com/Gar07/vizin"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center space-x-2 text-blue-500 hover:text-blue-600"
+            >
+              <Github className="w-5 h-5" />
+              <span>Lihat di GitHub</span>
+            </a>
+            <Button
+              variant="secondary"
+              onClick={handleShowTutorial}
+              className="inline-flex items-center space-x-2"
+            >
+              <HelpCircle className="w-5 h-5" />
+              <span>Tutorial</span>
+            </Button>
+          </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
