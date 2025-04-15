@@ -47,18 +47,24 @@ export const Tutorial: React.FC<TutorialProps> = ({ forceShow = false }) => {
   const [touchEnd, setTouchEnd] = useState(0);
 
   const tutorialSeen = usePreferencesStore(state => state.tutorialSeen);
+  const isManualTutorial = usePreferencesStore(state => state.isManualTutorial);
   const setTutorialSeen = usePreferencesStore(state => state.setTutorialSeen);
+  const setManualTutorial = usePreferencesStore(state => state.setManualTutorial);
 
-  const [isOpen, setIsOpen] = useState(!tutorialSeen || forceShow);
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    // Show tutorial on first visit or when manually triggered
+    if (!tutorialSeen || (forceShow && isManualTutorial)) {
+      setIsOpen(true);
+    }
+  }, [tutorialSeen, forceShow, isManualTutorial]);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
     setTutorialSeen(true);
-  }, [setTutorialSeen]);
-
-  useEffect(() => {
-    setIsOpen(!tutorialSeen || forceShow);
-  }, [tutorialSeen, forceShow]);
+    setManualTutorial(false);
+  }, [setTutorialSeen, setManualTutorial]);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -71,7 +77,7 @@ export const Tutorial: React.FC<TutorialProps> = ({ forceShow = false }) => {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [isOpen, currentStep, handleClose]);
+  }, [isOpen, handleClose]);
 
   const handleNext = () => {
     if (currentStep < tutorialSteps.length - 1) {

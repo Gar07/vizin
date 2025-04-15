@@ -29,7 +29,7 @@ function App() {
   const [showTutorial, setShowTutorial] = useState(false);
 
   const addToHistory = useCalculusStore(state => state.addToHistory);
-  const resetTutorial = usePreferencesStore(state => state.resetTutorial);
+  const setManualTutorial = usePreferencesStore(state => state.setManualTutorial);
 
   const handleFunctionSubmit = (func: string, lower: number, upper: number) => {
     try {
@@ -51,7 +51,6 @@ function App() {
         volumeIntegral: `π × (${func})²`,
       });
 
-      // Add calculation to history
       addToHistory({
         function: func,
         lowerBound: lower,
@@ -69,7 +68,7 @@ function App() {
   };
 
   const handleShowTutorial = () => {
-    resetTutorial();
+    setManualTutorial(true);
     setShowTutorial(true);
   };
 
