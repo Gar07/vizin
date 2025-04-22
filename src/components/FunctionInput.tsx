@@ -6,6 +6,8 @@ import { Button } from './Button';
 import { validateMathFunction, validateBounds } from '../utils/validation';
 import { useCalculusStore } from '../store/calculusStore';
 import { Dialog } from '@headlessui/react';
+import { BlockMath } from 'react-katex';
+import 'katex/dist/katex.min.css';
 
 interface FunctionInputProps {
   onSubmit: (func: string, lower: number, upper: number) => void;
@@ -27,14 +29,12 @@ export const FunctionInput: React.FC<FunctionInputProps> = ({ onSubmit }) => {
     e.preventDefault();
     setError(null);
 
-    // Validate function
     const funcValidation = validateMathFunction(function_);
     if (!funcValidation.isValid) {
       setError(funcValidation.error);
       return;
     }
 
-    // Validate bounds
     const boundsValidation = validateBounds(parseFloat(lowerBound), parseFloat(upperBound));
     if (!boundsValidation.isValid) {
       setError(boundsValidation.error);
@@ -107,7 +107,10 @@ export const FunctionInput: React.FC<FunctionInputProps> = ({ onSubmit }) => {
         <div className="relative">
           <label className="block text-sm font-medium text-gray-700">
             Fungsi f(x)
-            <div className="mt-1 relative">
+            <div className="mt-1 relative flex items-center">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <BlockMath math="\int" />
+              </div>
               <input
                 type="text"
                 value={function_}
@@ -115,7 +118,7 @@ export const FunctionInput: React.FC<FunctionInputProps> = ({ onSubmit }) => {
                   setFunction(e.target.value);
                   setError(null);
                 }}
-                className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+                className={`block w-full pl-14 pr-10 py-2 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
                   error ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="Contoh: x^2, sin(x)"
@@ -215,18 +218,61 @@ export const FunctionInput: React.FC<FunctionInputProps> = ({ onSubmit }) => {
           <span>Hitung</span>
         </Button>
 
-        <div className="bg-blue-50 p-4 rounded-md">
-          <div className="flex items-center space-x-2 mb-2">
-            <BookOpen className="w-4 h-4 text-blue-500" />
-            <h3 className="font-medium text-blue-800">Panduan Penggunaan</h3>
+        <div className="bg-blue-50 p-6 rounded-md space-y-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <BookOpen className="w-5 h-5 text-blue-500" />
+            <h3 className="font-medium text-lg text-blue-800">Panduan Lengkap Penggunaan</h3>
           </div>
-          <ul className="text-sm text-blue-700 space-y-1">
-            <li>• Gunakan notasi matematika standar (Contoh: x^2, sin(x))</li>
-            <li>• Fungsi tersedia: sin, cos, tan, exp, ln, sqrt</li>
-            <li>• Gunakan * untuk perkalian (Contoh: 2*x)</li>
-            <li>• Konstanta: pi, e</li>
-            <li>• Klik tombol fungsi di keypad untuk input cepat</li>
-          </ul>
+
+          <div className="space-y-4">
+            <section>
+              <h4 className="font-medium text-blue-700 mb-2">Input Fungsi</h4>
+              <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                <li>Gunakan notasi matematika standar (x^2, sin(x))</li>
+                <li>Operator: +, -, *, /, ^ (pangkat)</li>
+                <li>Fungsi trigonometri: sin(x), cos(x), tan(x)</li>
+                <li>Fungsi lain: exp(x), ln(x), sqrt(x)</li>
+                <li>Konstanta: pi, e</li>
+              </ul>
+            </section>
+
+            <section>
+              <h4 className="font-medium text-blue-700 mb-2">Batas Integral</h4>
+              <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                <li>Masukkan batas bawah dan atas untuk interval integrasi</li>
+                <li>Gunakan angka desimal dengan titik (contoh: 1.5)</li>
+                <li>Batas atas harus lebih besar dari batas bawah</li>
+              </ul>
+            </section>
+
+            <section>
+              <h4 className="font-medium text-blue-700 mb-2">Visualisasi</h4>
+              <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                <li>Grafik 2D menampilkan fungsi pada interval yang ditentukan</li>
+                <li>Visualisasi 3D menunjukkan benda putar hasil rotasi</li>
+                <li>Gunakan mouse/touch untuk merotasi dan zoom visualisasi 3D</li>
+              </ul>
+            </section>
+
+            <section>
+              <h4 className="font-medium text-blue-700 mb-2">Hasil Perhitungan</h4>
+              <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                <li>Panjang busur: panjang kurva pada interval</li>
+                <li>Luas permukaan: luas permukaan benda putar</li>
+                <li>Volume: volume benda hasil rotasi</li>
+              </ul>
+            </section>
+
+            <section>
+              <h4 className="font-medium text-blue-700 mb-2">Tips</h4>
+              <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                <li>Gunakan keypad untuk input cepat fungsi dan operator</li>
+                <li>Pilih fungsi preset untuk contoh perhitungan</li>
+                <li>Simpan perhitungan di riwayat untuk referensi</li>
+                <li>Ekspor hasil visualisasi dalam format PDF</li>
+              </ul>
+            </section>
+          </div>
         </div>
       </div>
 

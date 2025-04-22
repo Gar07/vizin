@@ -4,7 +4,6 @@ import { FunctionPlot } from './components/FunctionPlot';
 import { ResultsDisplay } from './components/ResultsDisplay';
 import { CalculationSteps } from './components/CalculationSteps';
 import { InteractiveLearning } from './components/InteractiveLearning';
-import { Tutorial } from './components/Tutorial';
 import { calculateArcLength, calculateSurfaceArea, calculateVolume, calculateDerivative } from './utils/calculus';
 import { CalculusResult } from './types';
 import { Github, HelpCircle } from 'lucide-react';
@@ -26,10 +25,8 @@ function App() {
     surfaceAreaIntegral: '',
     volumeIntegral: '',
   });
-  const [showTutorial, setShowTutorial] = useState(false);
 
   const addToHistory = useCalculusStore(state => state.addToHistory);
-  const setManualTutorial = usePreferencesStore(state => state.setManualTutorial);
 
   const handleFunctionSubmit = (func: string, lower: number, upper: number) => {
     try {
@@ -67,14 +64,8 @@ function App() {
     }
   };
 
-  const handleShowTutorial = () => {
-    setManualTutorial(true);
-    setShowTutorial(true);
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 py-4 sm:py-8 px-3 sm:px-4">
-      <Tutorial forceShow={showTutorial} />
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         <header className="text-center">
           <div className="flex items-center justify-center space-x-2 mb-3 sm:mb-4">
@@ -102,14 +93,6 @@ function App() {
               <Github className="w-5 h-5" />
               <span>Lihat di GitHub</span>
             </a>
-            <Button
-              variant="secondary"
-              onClick={handleShowTutorial}
-              className="inline-flex items-center space-x-2"
-            >
-              <HelpCircle className="w-5 h-5" />
-              <span>Tutorial</span>
-            </Button>
           </div>
         </header>
 
